@@ -62,7 +62,7 @@ library("dplyr")
 library("patchwork")
 #Loading the Palmerpenguins data set, and cleaning the data
 
-write.csv(penguins_raw, "data/penguins_raw.csv")
+write.csv(penguins_raw, "penguins_raw.csv")
 
 #Creating the 'penguins_clean' data- it has computer-readable column names, and any empty columns and rows are removed.
 penguins_clean <- penguins_raw %>%
