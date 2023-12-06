@@ -138,8 +138,14 @@ results_figure <- ggplot(penguins_clean, aes(x = body_mass_g, y = flipper_length
        x = "Body Mass (g)",
        y = "Flipper Length (mm)",
        legend= "Species",
-       subtitle="Adjusted R-squared:  0.8553 
-F-statistic: 404.2 on 5 and 336 DF,  p-value: < 2.2e-16")+
+       subtitle=" Results of ANCOVA test:
+                                        Df Sum Sq Mean Sq   F value Pr(>F)    
+body_mass_g                 1  51176   51176 1789.0875 <2e-16 ***
+species                           2   6411    3206  112.0661 <2e-16 ***
+body_mass_g:species   2    228     114    3.9837 0.0195 *  
+Residuals                       336   9611      29                     
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1")+
   theme(plot.title = element_text(size = 6))+
   scale_colour_manual(values=c("#AA336A", "blue", "purple"))+
   theme_minimal()
