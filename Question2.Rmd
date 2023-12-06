@@ -32,7 +32,7 @@ remove_empty_columns_rows <- function(penguins_data) {
 
 
 ### Introduction
-I wanted to explore the relationship between body mass and flipper length in the Palmer penguins data set. To explore these variables, I created a scatter plot- this showed a strong linear relationship between the two, as a linear line of best fit fit the data well. using this observation, I proceeded to perform a Pearson's correlation test, to see if this observed relationship was staistically significant, and fit the hypotheses I formed. Below, you can see the scatter plot I created, and the rest of my statistical method.
+I wanted to explore the relationship between body mass and flipper length in the Palmer penguins data set. To explore these variables, I created a scatter plot- this showed a strong linear relationship between the two, as a linear line of best fit fit the data well. using this observation, I proceeded to perform a linear regression test, to see if this observed relationship was staistically significant, and fit the hypotheses I formed. Below, you can see the scatter plot I created, and the rest of my statistical method.
 
 ```{r Data Exploration}
 #Installing packages if necessary, and loading them
