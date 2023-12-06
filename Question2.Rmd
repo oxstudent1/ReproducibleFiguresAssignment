@@ -1,0 +1,142 @@
+---
+title: "Question2"
+date: "2023-12-04"
+output: html_document
+---
+
+Functions used in this markdown:
+```{r}
+
+#cleaning up column names- to make them computer readable
+clean_column_names <- function(penguins_data) {
+  penguins_data %>%
+    clean_names()
+}
+
+#Shortening species names in the data file
+shorten_species <- function(penguins_data) {
+  penguins_data %>%
+    mutate(species = case_when(
+      species == "Adelie Penguin (Pygoscelis adeliae)" ~ "Adelie",
+      species == "Chinstrap penguin (Pygoscelis antarctica)" ~ "Chinstrap",
+      species == "Gentoo penguin (Pygoscelis papua)" ~ "Gentoo"
+    ))
+}
+
+#Removing empty columns and rows
+remove_empty_columns_rows <- function(penguins_data) {
+  penguins_data %>%
+    remove_empty(c("rows", "cols"))
+}
+```
+
+
+### Introduction
+I wanted to explore the relationship between body mass and flipper length in the Palmer penguins data set. To explore these variables, I created a scatter plot- this showed a strong linear relationship between the two, as a linear line of best fit fit the data well. using this observation, I proceeded to perform a Pearson's correlation test, to see if this observed relationship was staistically significant, and fit the hypotheses I formed. Below, you can see the scatter plot I created, and the rest of my statistical method.
+
+```{r Data Exploration}
+#Installing packages if necessary, and loading them
+
+if (!requireNamespace("palmerpenguins", quietly = TRUE)) {
+  install.packages("palmerpenguins")
+}
+
+if (!requireNamespace("ggplot2", quietly = TRUE)) {
+  install.packages("ggplot2")
+}
+if (!requireNamespace("janitor", quietly = TRUE)) {
+  install.packages("janitor")
+}
+if (!requireNamespace("dplyr", quietly = TRUE)) {
+  install.packages("dplyr")
+}
+
+
+library("ggplot2") #to plot the graphs needed
+library("janitor") #to clean the data
+library("palmerpenguins") #to load the palmerpenguins data
+library("dplyr") #to pipe functions together
+#Loading the Palmerpenguins data set, and cleaning the data
+#Saving the data as a .csv file:
+write.csv(penguins_raw, "penguins_raw.csv")
+
+#Creating the 'penguins_clean' data- it has computer-readable column names, and any empty columns and rows are removed.
+penguins_clean <- penguins_raw %>%
+    clean_column_names() %>%
+    shorten_species() %>%
+    remove_empty_columns_rows()
+#Saving this dataset as a .csv file:
+write.csv(penguins_clean, "penguins_clean.csv")
+
+#Creating a scatter plot to show the correlation between flipper length and body mass
+FlipperLength_BodyMass_plot<- ggplot(penguins_clean, aes(x = body_mass_g, y = flipper_length_mm, colour= species)) +
+  geom_point() +
+    labs(title = "The relationship between body mass and flipper length",
+       x = "Body Mass (g)",
+       y = "Flipper Length (mm)",
+       legend= "Species")+
+  theme(plot.title = element_text(size = 6))+
+  scale_colour_manual(values=c("#AA336A", "blue", "purple"))+
+  theme_minimal()
+
+FlipperLength_BodyMass_plot
+#Installing the ragg package, to save the image
+if (!requireNamespace("ragg", quietly = TRUE)) {
+  install.packages("ragg")
+}
+library(ragg)
+
+#Saving the objects as high resolution .png files, in the 'figures' folder
+agg_png("figures/FlipperLength_BodyMass_plot.png",  width = 4000, height = 3000, units = "px", res = 600)+
+print(FlipperLength_BodyMass_plot)
+dev.off()
+```
+
+### Hypothesis
+
+My hypothesis is that body mass and flipper length are positively correlated. The null hypothesis in this test is that there is no relation or correlation between these two variables, and the alternative hypothesis is that there is a positive correlation.
+
+### Statistical Methods
+
+In order to test this correlation, I will create a linear model, and perform a linear regression test on this data
+
+```{r Statistics}
+#Creating a linear regression model:
+model <- lm(flipper_length_mm ~ body_mass_g*species, data = penguins_clean)
+
+#Viewing the results of this model
+plot(model)
+summary(model)
+```
+
+### Results & Discussion
+When viewing the normal Q-Q plot, we can see that the points line up very well to the central line, indicating that a linear model is a good fit for these variables. The p value of the coefficient of body_mass_g is very low, indicating a high level of statistical significance- even after accounting for species, there is a strong positive correlation between body mass and flipper length. The p value of the coefficient for the two species are not significant, however, indicating that there is not a significant difference in the flipper length of the three species. There is a significant p value in the interactions between body mass and the species, however- indicating that the different penguin species have significantly different body masses. The adjusted R-squared is 0.8553, which indicates fairly strong correlation between flipper length and body mass, which is statistically significant according to the very low p value of less than 2.2e-16. This correlation does not imply causation, however- it is possible that this relationship does not mean anything in terms of one variable influencing the other. Looking at the two, however, it seems feasible to say that individuals with higher body mass are probably larger overall, so they are likely to have bigger body parts, including longer flippers.
+
+```{r Plotting Results}
+
+# Create a results figure with ggplot2
+results_figure <- ggplot(penguins_clean, aes(x = body_mass_g, y = flipper_length_mm, colour= species)) +
+  geom_point() +
+  geom_smooth(method=lm, linewidth=0.5)+
+    labs(title = "The relationship between body mass and flipper length",
+       x = "Body Mass (g)",
+       y = "Flipper Length (mm)",
+       legend= "Species",
+       subtitle="Adjusted R-squared:  0.8553 
+F-statistic: 404.2 on 5 and 336 DF,  p-value: < 2.2e-16")+
+  theme(plot.title = element_text(size = 6))+
+  scale_colour_manual(values=c("#AA336A", "blue", "purple"))+
+  theme_minimal()
+
+# Display the results figure
+print(results_figure)
+
+#Save the figure in the figures folder as a .png file
+agg_png("figures/Results_plot.png",  width = 4000, height = 3000, units = "px", res = 600)+
+print(results_figure)
+dev.off()
+
+
+```
+
+In conclusion, there is a significant level of correlation between flipper length and body mass- indicating a strong, linear relationship between these two variables, even when taking into account the three different species. The results show significant interactions between species and body mass, but not between species and flipper length, despite the strong correlation between body mass and flipper length. Further research into what other elements of penguin growth correlate with flipper length would be required to be able to see whether body mass truly plays a role into determining flipper length, and if one can be estimated from the other. In the future, I would perform statistical tests on more variables to determine this.
