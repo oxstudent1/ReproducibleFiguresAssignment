@@ -31,10 +31,13 @@ remove_empty_columns_rows <- function(penguins_data) {
 ```
 
 
-### Introduction
-I wanted to explore the relationship between body mass and flipper length in the Palmer penguins data set. To explore these variables, I created a scatter plot- this showed a strong linear relationship between the two, as a linear line of best fit fit the data well. using this observation, I proceeded to perform a linear regression test, to see if this observed relationship was staistically significant, and fit the hypotheses I formed. Below, you can see the scatter plot I created, and the rest of my statistical method.
+## QUESTION 2: Data Pipeline
 
-```{r Data Exploration}
+
+### Introduction
+I wanted to explore the relationship between body mass and flipper length in the Palmer penguins data set, and also to see if there was an interaction between these variables and the three different species. To explore these variables, I created a scatter plot- this showed a strong linear relationship between the two, as a linear line of best fit fit the data well. using this observation, I proceeded to perform an ANCOVA test based on a linear model, to see if this observed relationship was statistically significant, and fit the hypotheses I formed. Below, you can see the scatter plot I created, and the rest of my statistical method.
+
+```{r Cleaning and exploring the data}
 #Installing packages if necessary, and loading them
 
 if (!requireNamespace("palmerpenguins", quietly = TRUE)) {
@@ -81,6 +84,7 @@ FlipperLength_BodyMass_plot<- ggplot(penguins_clean, aes(x = body_mass_g, y = fl
   theme_minimal()
 
 FlipperLength_BodyMass_plot
+
 #Installing the ragg package, to save the image
 if (!requireNamespace("ragg", quietly = TRUE)) {
   install.packages("ragg")
@@ -96,11 +100,16 @@ dev.off()
 
 ### Hypothesis
 
-My hypothesis is that body mass and flipper length are positively correlated, and that there is an interaction between body mass and species. The null hypothesis in this test is that there is no relation or correlation between flipper length and body mass, and that there is no interaction between species and body mass, and the alternative hypothesis is that there is a positive correlation, with an interaction between species and body mass.
+My hypotheses are that body mass and flipper length are positively correlated, and that there is an interaction between body mass and species. 
+
+The null hypotheses in this test is that there is no relation or correlation between flipper length and body mass, and that there is no interaction between species and body mass, so the slopes of the graph are not significantly different from each other.
+
+
+The alternative hypotheses are that there is a positive correlation, with an interaction between species and body mass, so the slopes of the graph are significantly different from each other.
 
 ### Statistical Methods
 
-In order to test this correlation, I will create a linear model, and perform a linear regression test on this data. This will demonstrate whether there is a linear relationship between the two variables, while accounting for the interaction between body mass and species, and flipper length and species- if there is one.
+In order to test this correlation, I will create a linear model, and perform an ANCOVA test on this data. This will demonstrate whether there is a linear relationship between the two variables, while accounting for the interaction between body mass and species, and flipper length and species- if there is one.
 
 ```{r Statistics}
 #Creating a linear regression model:
@@ -108,10 +117,16 @@ model <- lm(flipper_length_mm ~ body_mass_g*species, data = penguins_clean)
 
 #Viewing the results of this model
 summary(model)
+
+#Performing an ANCOVA test
+anova(model)
 ```
 
 ### Results & Discussion
-The p value of the coefficient of body_mass_g is very low, indicating a high level of statistical significance- even after accounting for species, there is a strong positive correlation between body mass and flipper length. The p value of the coefficient for the two species are not significant, however, indicating that there is not a significant difference in the flipper length of the three species. There is a significant p value in the interactions between body mass and the species, however- indicating that the different penguin species have significantly different body masses. The adjusted R-squared is 0.8553, showing that 85.53% of the variation in flipper length is explained by the model- this is statistically significant according to the very low p value of less than 2.2e-16. This correlation does not imply causation, however- it is possible that this relationship does not mean anything in terms of one variable influencing the other. Looking at the two, however, it seems feasible to say that individuals with higher body mass are probably larger overall, so they are likely to have bigger body parts, including longer flippers.
+
+The linear model shows that there is a statistically significant correlation between flipper length and body mass, and we can see that the p value of the intercept is <2e16. The p values for the F-ratios of both the body mass, the species, and the interaction between the two are all significant at the 95% level- indicating that there is a significant correlation between flipper length and body mass, and there is also a significant interaction between body mass and species: the body mass of each species is significantly different from each other, and the slopes of the models of each species are significantly different. We reject the null hypothesis. 
+
+However, there are some limitations to this model- primarily, I have assumed that this data fits a linear model, in order to  perform this test. This assumption does reduce the power of this test. Also, there may be confounding variables which are affecting the results, which I have not accounted for here.
 
 ```{r Plotting Results}
 
@@ -140,4 +155,4 @@ dev.off()
 
 ```
 
-In conclusion, there is a significant level of correlation between flipper length and body mass- indicating a strong, linear relationship between these two variables, even when taking into account the three different species. The results show significant interactions between species and body mass, but not between species and flipper length, despite the strong correlation between body mass and flipper length. Further research into what other elements of penguin growth correlate with flipper length would be required to be able to see whether body mass truly plays a role into determining flipper length, and if one can be estimated from the other. In the future, I would perform statistical tests on more variables to determine this.
+In conclusion, there is a significant level of correlation between flipper length and body mass- indicating a strong, linear relationship between these two variables, even when taking into account the three different species. The results also show significant interactions between species and body mass, and that the slopes of each species are significantly different. Further research into what other elements of penguin growth correlate with flipper length would be required to be able to see whether body mass truly plays a role into determining flipper length, and if one can be estimated from the other. In the future, I would perform statistical tests on more variables to determine this.
